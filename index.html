@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Profile — Open in Browser</title>
+  <meta name="description" content="Profile page with animated Click Here box that tries to open the link in the device browser (Chrome on Android)" />
+  <style>
+    :root{--bg:#0b1220;--card:#0f1724;--accent:#ff5ca2}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#071026,#081425);font-family:Inter,system-ui,Arial;color:#fff;padding:24px}
+    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:22px;border-radius:16px;max-width:360px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
+    .avatar{width:160px;height:160px;border-radius:50%;overflow:hidden;margin:0 auto 18px;border:6px solid rgba(255,255,255,0.04);background:#0a0a0a}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    h1{font-size:18px;margin:6px 0 2px}
+    p.sub{margin:0 0 16px;font-size:13px;color:rgba(255,255,255,0.75)}
+
+    /* animated click box */
+    .click-box{display:inline-block;padding:14px 26px;border-radius:12px;background:linear-gradient(180deg,var(--accent),#e24a8e);font-weight:700;cursor:pointer;user-select:none;box-shadow:0 10px 30px rgba(0,0,0,0.45);transition:transform 220ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms;position:relative}
+    .click-box:active{transform:translateY(6px)}
+    .click-box .pulse{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%;border-radius:12px;animation:pulse 1.6s infinite;opacity:0.25}
+    @keyframes pulse{0%{transform:translate(-50%,-50%) scale(1);opacity:0.28}70%{transform:translate(-50%,-50%) scale(1.65);opacity:0}100%{opacity:0}}
+
+    .note{margin-top:12px;font-size:12px;color:rgba(255,255,255,0.7)}
+    .small{font-size:12px;color:rgba(255,255,255,0.6);margin-top:10px}
+
+    /* responsive */
+    @media (max-width:420px){.avatar{width:128px;height:128px}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="avatar" id="avatarWrap">
+      <!-- Image will be injected by JS. Replace IMAGE_SRC variable in script -->
+      <img id="avatarImg" src="" alt="Profile photo">
+    </div>
+    <h1 id="displayName">Your Name</h1>
+    <p class="sub">Tap the box below to open the personal link in your device browser.</p>
+
+    <div class="click-box" id="clickBox" role="button" tabindex="0">
+      <div class="pulse"></div>
+      <span id="clickText">Click Here</span>
+    </div>
+
+    <div class="note">Share this page URL in Telegram. When someone taps it, this page will attempt to open your personal link directly in the phone browser (Chrome on Android when possible).</div>
+    <div class="small">If you want to edit: change IMAGE_SRC &amp; PERSONAL_LINK in the script below, then upload to any static host (GitHub Pages, Netlify, Vercel).</div>
+  </div>
+
+  <script>
+    /* ===== EDIT THESE ===== */
+    // 1) Put your profile image file in the same folder and set the filename here (example: 'profile.jpg')
+    //    For testing in this environment you can use the provided local path.
+    const IMAGE_SRC = 'photo_2025-10-25_00-39-09.jpg'; // replace with 'profile.jpg' after upload
+
+    // 2) Put the personal link you want people to go to when they click (must include https://)
+    const PERSONAL_LINK = 'https://example.com'; // <- replace with your personal link
+    /* ======================= */
+
+    const avatarImg = document.getElementById('avatarImg');
+    const displayName = document.getElementById('displayName');
+    const clickBox = document.getElementById('clickBox');
+
+    // set image; if it fails to load, hide image container gracefully
+    avatarImg.src = IMAGE_SRC;
+    avatarImg.addEventListener('error', ()=>{
+      document.getElementById('avatarWrap').style.display = 'none';
+    });
+
+    // optional: extract name from link or show custom name
+    displayName.textContent = '';
+
+    // function to attempt opening PERSONAL_LINK in device browser (tries Chrome on Android via intent)
+    function openInBrowser(url){
+      const ua = navigator.userAgent || '';
+      const isAndroid = /Android/i.test(ua);
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+      if(isAndroid){
+        // Build an intent URL that asks Android to open Chrome (if installed)
+        // Note: some apps (including Telegram) may still open their in-app browser; behavior varies by client.
+        const intentUrl = `intent:${url.replace(/^https?:/,'')}#Intent;package=com.android.chrome;scheme=https;end`;
+        // Try to open Chrome via intent
+        window.location.href = intentUrl;
+        // Fallback: after short delay, open the normal URL (in case intent blocked)
+        setTimeout(()=>{ window.location.href = url; }, 1200);
+      } else if(isIOS){
+        // iOS: can't reliably force Chrome; open in new tab which usually triggers system browser choice
+        window.open(url, '_blank', 'noopener');
+      } else {
+        // Desktop / fallback: open new tab
+        window.open(url, '_blank', 'noopener');
+      }
+    }
+
+    clickBox.addEventListener('click', ()=>{
+      openInBrowser(PERSONAL_LINK);
+    });
+    clickBox.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); clickBox.click(); } });
+  </script>
+</body>
+</html>
