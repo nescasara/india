@@ -1,101 +1,162 @@
+
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Profile — Open in Browser</title>
-  <meta name="description" content="Profile page with animated Click Here box that tries to open the link in the device browser (Chrome on Android)" />
+  <title>My 3D Profile</title>
+  <meta name="description" content="3D personal profile landing page. Responsive and works on all devices." />
   <style>
-    :root{--bg:#0b1220;--card:#0f1724;--accent:#ff5ca2}
-    *{box-sizing:border-box}
-    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#071026,#081425);font-family:Inter,system-ui,Arial;color:#fff;padding:24px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:22px;border-radius:16px;max-width:360px;width:100%;text-align:center;box-shadow:0 12px 40px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03)}
-    .avatar{width:160px;height:160px;border-radius:50%;overflow:hidden;margin:0 auto 18px;border:6px solid rgba(255,255,255,0.04);background:#0a0a0a}
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    h1{font-size:18px;margin:6px 0 2px}
-    p.sub{margin:0 0 16px;font-size:13px;color:rgba(255,255,255,0.75)}
+    :root {
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:linear-gradient(135deg,#7c3aed,#06b6d4);
+      --glass: rgba(255,255,255,0.04);
+      --text:#e6eef8;
+    }
+    * {box-sizing:border-box;}
+    html, body {height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;overflow:hidden;}
+    body {
+      background:var(--bg);
+      color:var(--text);
+      display:flex;align-items:center;justify-content:center;padding:32px;position:relative;overflow:hidden;
+    }
 
-    /* animated click box */
-    .click-box{display:inline-block;padding:14px 26px;border-radius:12px;background:linear-gradient(180deg,var(--accent),#e24a8e);font-weight:700;cursor:pointer;user-select:none;box-shadow:0 10px 30px rgba(0,0,0,0.45);transition:transform 220ms cubic-bezier(.2,.9,.3,1), box-shadow 220ms;position:relative}
-    .click-box:active{transform:translateY(6px)}
-    .click-box .pulse{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:100%;height:100%;border-radius:12px;animation:pulse 1.6s infinite;opacity:0.25}
-    @keyframes pulse{0%{transform:translate(-50%,-50%) scale(1);opacity:0.28}70%{transform:translate(-50%,-50%) scale(1.65);opacity:0}100%{opacity:0}}
+    /* animated floating lights */
+    .floating-bg span {
+      position:absolute;
+      width:200px;height:200px;
+      background:radial-gradient(circle,var(--accent),transparent 70%);
+      filter:blur(60px);
+      opacity:0.2;
+      border-radius:50%;
+      animation:float 18s ease-in-out infinite;
+    }
+    .floating-bg span:nth-child(1){top:-60px;left:-80px;animation-delay:0s;}
+    .floating-bg span:nth-child(2){bottom:-80px;right:-70px;animation-delay:5s;}
+    .floating-bg span:nth-child(3){top:50%;left:40%;animation-delay:9s;}
+    @keyframes float {
+      0%,100%{transform:translate(0,0) scale(1);}
+      50%{transform:translate(40px,60px) scale(1.2);}
+    }
 
-    .note{margin-top:12px;font-size:12px;color:rgba(255,255,255,0.7)}
-    .small{font-size:12px;color:rgba(255,255,255,0.6);margin-top:10px}
+    .wrap {width:100%;max-width:480px;z-index:2;}
 
-    /* responsive */
-    @media (max-width:420px){.avatar{width:128px;height:128px}}
+    .card {
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:20px;padding:30px;backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      transform-style:preserve-3d;transition:transform 250ms ease;
+    }
+
+    .stage {perspective:1200px;}
+    .inner {transform-style:preserve-3d;transition:transform 150ms ease-out;}
+
+    .avatar {
+      width:160px;height:160px;border-radius:50%;overflow:hidden;margin:0 auto;
+      box-shadow:0 8px 30px rgba(2,6,23,0.6);border:4px solid rgba(255,255,255,0.04);
+      transform:translateZ(40px);
+    }
+    .avatar img {width:100%;height:100%;object-fit:cover;display:block;}
+
+    h1 {font-size:1.5rem;margin:18px 0 6px;text-align:center;letter-spacing:0.4px;}
+    p.lead {text-align:center;margin:0 0 18px;color:rgba(230,238,248,0.78);}
+
+    .links {display:flex;flex-direction:column;align-items:center;gap:14px;}
+    .btn {
+      display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:14px;
+      background:var(--glass);border:1px solid rgba(255,255,255,0.04);
+      cursor:pointer;text-decoration:none;color:var(--text);font-weight:600;
+      box-shadow:0 6px 18px rgba(2,6,23,0.45);transform:translateZ(20px);
+    }
+    .btn.primary {
+      background:var(--accent);color:#fff;border:none;
+      box-shadow:0 10px 30px rgba(124,58,237,0.16);
+    }
+
+    .meta {font-size:0.8rem;color:rgba(230,238,248,0.45);text-align:center;margin-top:14px;}
+
+    @media (max-width:420px) {.avatar{width:140px;height:140px}.card{padding:22px}}
+
+    .tg-modal {position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      padding:18px;border-radius:12px;box-shadow:0 12px 40px rgba(2,6,23,0.6);
+      display:none;z-index:60;max-width:360px;text-align:center;}
+    .tg-modal.show {display:block;}
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="avatar" id="avatarWrap">
-      <!-- Image will be injected by JS. Replace IMAGE_SRC variable in script -->
-      <img id="avatarImg" src="" alt="Profile photo">
-    </div>
-    <h1 id="displayName">Your Name</h1>
-    <p class="sub">Tap the box below to open the personal link in your device browser.</p>
+  <div class="floating-bg">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 
-    <div class="click-box" id="clickBox" role="button" tabindex="0">
-      <div class="pulse"></div>
-      <span id="clickText">Click Here</span>
-    </div>
+  <div class="wrap">
+    <div class="stage">
+      <div class="card" id="card">
+        <div class="inner" id="inner">
+          <div class="avatar" id="avatar">
+            <img src="profile.jpg" alt="Profile photo" id="profileImg"/>
+          </div>
 
-    <div class="note">Share this page URL in Telegram. When someone taps it, this page will attempt to open your personal link directly in the phone browser (Chrome on Android when possible).</div>
-    <div class="small">If you want to edit: change IMAGE_SRC &amp; PERSONAL_LINK in the script below, then upload to any static host (GitHub Pages, Netlify, Vercel).</div>
+          <h1 id="name">My Profile</h1>
+
+          <div class="links">
+            <a class="btn primary" id="mainBtn" href="https://cghhicb.directoffrs.com/c/b336d47373d25?sub1=mmm" target="_blank" rel="noopener noreferrer">Click Here</a>
+          </div>
+
+          <div class="meta">3D tilt effect • Works on all devices</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tg-modal" id="tgModal">
+    <p><strong>Opened inside Telegram</strong></p>
+    <p>Please tap “Open in browser” to view the full 3D experience.</p>
+    <a id="tryOpen" class="btn primary" href="#">Open in browser</a><br><br>
+    <a id="closeModal" class="btn" href="#">Close</a>
   </div>
 
   <script>
-    /* ===== EDIT THESE ===== */
-    // 1) Put your profile image file in the same folder and set the filename here (example: 'profile.jpg')
-    //    For testing in this environment you can use the provided local path.
-    const IMAGE_SRC = 'photo_2025-10-25_00-39-09.jpg'; // replace with 'profile.jpg' after upload
+    const card = document.getElementById('card');
+    const inner = document.getElementById('inner');
+    const avatar = document.getElementById('avatar');
 
-    // 2) Put the personal link you want people to go to when they click (must include https://)
-    const PERSONAL_LINK = 'https://example.com'; // <- replace with your personal link
-    /* ======================= */
-
-    const avatarImg = document.getElementById('avatarImg');
-    const displayName = document.getElementById('displayName');
-    const clickBox = document.getElementById('clickBox');
-
-    // set image; if it fails to load, hide image container gracefully
-    avatarImg.src = IMAGE_SRC;
-    avatarImg.addEventListener('error', ()=>{
-      document.getElementById('avatarWrap').style.display = 'none';
-    });
-
-    // optional: extract name from link or show custom name
-    displayName.textContent = '';
-
-    // function to attempt opening PERSONAL_LINK in device browser (tries Chrome on Android via intent)
-    function openInBrowser(url){
-      const ua = navigator.userAgent || '';
-      const isAndroid = /Android/i.test(ua);
-      const isIOS = /iPhone|iPad|iPod/i.test(ua);
-
-      if(isAndroid){
-        // Build an intent URL that asks Android to open Chrome (if installed)
-        // Note: some apps (including Telegram) may still open their in-app browser; behavior varies by client.
-        const intentUrl = `intent:${url.replace(/^https?:/,'')}#Intent;package=com.android.chrome;scheme=https;end`;
-        // Try to open Chrome via intent
-        window.location.href = intentUrl;
-        // Fallback: after short delay, open the normal URL (in case intent blocked)
-        setTimeout(()=>{ window.location.href = url; }, 1200);
-      } else if(isIOS){
-        // iOS: can't reliably force Chrome; open in new tab which usually triggers system browser choice
-        window.open(url, '_blank', 'noopener');
-      } else {
-        // Desktop / fallback: open new tab
-        window.open(url, '_blank', 'noopener');
-      }
+    function handleMove(e){
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX || (e.touches && e.touches[0].clientX)) - rect.left) - rect.width/2;
+      const y = ((e.clientY || (e.touches && e.touches[0].clientY)) - rect.top) - rect.height/2;
+      const rx = (-y / rect.height) * 12;
+      const ry = (x / rect.width) * 12;
+      inner.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      avatar.style.transform = `translateZ(60px) rotateY(${ry/6}deg)`;
     }
+    function reset(){ inner.style.transform='rotateX(0) rotateY(0)'; avatar.style.transform='translateZ(40px)'; }
+    card.addEventListener('mousemove', handleMove);
+    card.addEventListener('touchmove', handleMove);
+    card.addEventListener('mouseleave', reset);
+    card.addEventListener('touchend', reset);
 
-    clickBox.addEventListener('click', ()=>{
-      openInBrowser(PERSONAL_LINK);
+    function isTelegram(){ const ua = navigator.userAgent || ''; return /Telegram/.test(ua) || /TelegramWebView/.test(ua) || /TgWeb/.test(ua); }
+    const tgModal = document.getElementById('tgModal');
+    const tryOpen = document.getElementById('tryOpen');
+    const closeModal = document.getElementById('closeModal');
+
+    if(isTelegram()) setTimeout(()=>tgModal.classList.add('show'),700);
+
+    tryOpen.addEventListener('click', (ev)=>{
+      ev.preventDefault();
+      const url = document.getElementById('mainBtn').href;
+      const win = window.open(url, '_blank');
+      if(!win){
+        if(navigator.clipboard){ navigator.clipboard.writeText(url).then(()=>alert('Link copied! Paste it into your browser.')); }
+        else{ prompt('Copy this link and open in your browser:', url); }
+      }
     });
-    clickBox.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); clickBox.click(); } });
+
+    closeModal.addEventListener('click',(ev)=>{ev.preventDefault();tgModal.classList.remove('show');});
   </script>
 </body>
 </html>
